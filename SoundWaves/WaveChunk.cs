@@ -6,18 +6,21 @@ using System.Threading.Tasks;
 
 namespace AudioMixer.SoundWaves
 {
-    public enum SampleRates : uint
+    public enum SampleRate : uint
     {
+        F8000Hz = 8000,
+        F22050Hz = 22050,
         F44kHz = 44100,
         F48kHz = 48000
+        
     }
 
     /// <summary>
     /// Represents A basic audio wave with floats
     /// </summary>
-    class WaveChunk
+    public class WaveChunk
     {
-        private readonly SampleRates _sampleRate;
+        private readonly SampleRate _sampleRate;
         private float[] _data;
 
         public float this[uint i]
@@ -36,12 +39,12 @@ namespace AudioMixer.SoundWaves
             get { return (uint)_data.Length; }
         }
 
-        public WaveChunk(SampleRates sampleRate, double runtime) : this (sampleRate, (uint) ((uint)sampleRate * runtime) )
+        public WaveChunk(SampleRate sampleRate, double runtime) : this (sampleRate, (uint) ((uint)sampleRate * runtime) )
         { }
         
-        public WaveChunk(SampleRates sampleRate, uint nSamples)
+        public WaveChunk(SampleRate sampleRate, uint nSamples)
         {
-            bool isSampleRateValid = Enum.IsDefined(typeof(SampleRates), sampleRate);
+            bool isSampleRateValid = Enum.IsDefined(typeof(SampleRate), sampleRate);
             if (!isSampleRateValid)
                 throw new ArgumentException("Sample Rate Invalid.");
 

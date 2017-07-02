@@ -11,16 +11,17 @@ namespace AudioMixer.SoundWaves
         SineWave,
         Square,
         Sawtooth,
-        Triangle
+        Triangle,
+        WhiteNoise
     }
 
-    public struct RepeatingWaveAttributes
+    public struct WaveAttributes
     {
-        public SampleRates WaveSampleRate;
+        public SampleRate WaveSampleRate;
         public double Runtime;
         public double TargetFrequency;
 
-        public RepeatingWaveAttributes(SampleRates waveSampleRate, double runtime, double targetFrequency)
+        public WaveAttributes(SampleRate waveSampleRate, double runtime, double targetFrequency)
         {
             WaveSampleRate = waveSampleRate;
             Runtime = runtime;
@@ -33,7 +34,7 @@ namespace AudioMixer.SoundWaves
     // Creates Various classical waves
     static class WaveFactory
     {
-        static private WaveChunk MakeSineWave(RepeatingWaveAttributes waveAttributes)
+        static private WaveChunk MakeSineWave(WaveAttributes waveAttributes)
         {
             WaveChunk wave = new WaveChunk(waveAttributes.WaveSampleRate, waveAttributes.Runtime);
 
@@ -49,7 +50,7 @@ namespace AudioMixer.SoundWaves
             return wave;
         }
 
-        static private WaveChunk MakeSquareWave(RepeatingWaveAttributes waveAttributes)
+        static private WaveChunk MakeSquareWave(WaveAttributes waveAttributes)
         {
             WaveChunk wave = MakeSineWave(waveAttributes);
             uint nSamples = wave.NumSamples;
@@ -60,7 +61,7 @@ namespace AudioMixer.SoundWaves
 
         }
 
-        private static WaveChunk MakeSawtooth(RepeatingWaveAttributes waveAttr)
+        private static WaveChunk MakeSawtooth(WaveAttributes waveAttr)
         {
             WaveChunk wave = new WaveChunk(waveAttr.WaveSampleRate, waveAttr.Runtime);
             uint numSamples = wave.NumSamples;
@@ -79,7 +80,7 @@ namespace AudioMixer.SoundWaves
 
         }
 
-        private static WaveChunk MakeTriangle(RepeatingWaveAttributes waveAttr)
+        private static WaveChunk MakeTriangle(WaveAttributes waveAttr)
         {
             WaveChunk wave = new WaveChunk(waveAttr.WaveSampleRate, waveAttr.Runtime);
             uint numSamples = wave.NumSamples;
@@ -104,7 +105,7 @@ namespace AudioMixer.SoundWaves
         /// <param name="waveType"></param>
         /// <param name="waveAttributes"></param>
         /// <returns></returns>
-        static public WaveChunk MakeRepeatingWave(WaveTypes waveType, RepeatingWaveAttributes waveAttributes)
+        static public WaveChunk MakeWave(WaveTypes waveType, WaveAttributes waveAttributes)
         {
             switch(waveType)
             {
@@ -116,6 +117,8 @@ namespace AudioMixer.SoundWaves
                     return MakeSawtooth(waveAttributes);
                 case WaveTypes.Triangle:
                     return MakeTriangle(waveAttributes);
+                case WaveTypes.WhiteNoise:
+                    return MakeWhiteNoise(waveAttributes);
                 default:
                     throw new ArgumentException("Not a valid wave type");
 
@@ -123,7 +126,7 @@ namespace AudioMixer.SoundWaves
             
         }
 
-        static private WaveChunk MakeWhiteNoise(RepeatingWaveAttributes waveAttr)
+        static private WaveChunk MakeWhiteNoise(WaveAttributes waveAttr)
         {
             WaveChunk wave = new WaveChunk(waveAttr.WaveSampleRate, waveAttr.Runtime);
             uint numSamples = wave.NumSamples;
@@ -137,11 +140,7 @@ namespace AudioMixer.SoundWaves
 
             return wave;
         }
-
-        static public WaveChunk MakeNoise(RepeatingWaveAttributes waveAttributes)
-        {
-            return MakeWhiteNoise(waveAttributes);
-        }
+        
 
         
     }

@@ -2,7 +2,7 @@
 using System.Text;
 using System;
 
-using SampleRates = AudioMixer.SoundWaves.SampleRates;
+using AudioMixer.SoundWaves;
 
 namespace AudioMixer.WAVFileGenerator
 {
@@ -34,7 +34,7 @@ namespace AudioMixer.WAVFileGenerator
             }
         }
 
-        public WAVGenerator SetAudioProperties(uint sampleRate, ushort nChannels)
+        private WAVGenerator SetAudioProperties(uint sampleRate, ushort nChannels)
         {
             CheckValidSampleRate(sampleRate);
 
@@ -45,16 +45,13 @@ namespace AudioMixer.WAVFileGenerator
 
         private static void CheckValidSampleRate(uint sampleRate)
         {
-            bool isSampleRateValid = Enum.IsDefined(typeof(SampleRates), sampleRate);
+            bool isSampleRateValid = Enum.IsDefined(typeof(SampleRate), sampleRate);
             if (!isSampleRateValid)
                 throw new ArgumentException("Sample Rate Invalid.");
         }
 
-        public void SaveToFile(string filePath)
+        private void SaveToFile(BinaryWriter writer)
         {
-            FileStream fileStream = new FileStream(filePath, FileMode.Create);
-            
-            BinaryWriter writer = new BinaryWriter(fileStream, Encoding.ASCII);
             header.WriteToFile(writer);
             format.WriteToFile(writer);
             data.WriteToFile(writer);
@@ -64,13 +61,29 @@ namespace AudioMixer.WAVFileGenerator
             writer.Write(filesize - 8);
 
             // Clean up
-            writer.Close();
-            fileStream.Close();
+            //writer.Close();
         }
 
-        public void SetMonoData(short[] monoData)
+        private void SetMonoData(short[] monoData)
         {
             data.DataArray = monoData;
+        }
+
+        public static void CreateMonoWAVFile(string filePath, SampleRate sampleRate, WaveChunk wave)
+        {
+            FileStream stream = new FileStream(filePath, FileMode.Create);
+            BinaryWriter writer = new BinaryWriter(stream, Encoding.ASCII);
+            WriteToStream(writer, sampleRate, wave);
+            writer.Close();
+        }
+
+        public static void WriteToStream(BinaryWriter writer, SampleRate sampleRate, WaveChunk wave)
+        {
+            WAVGenerator generator = Singleton.SetAudioProperties((uint)sampleRate, 1);
+            var data = WaveChunk.Get16BitArray(wave);
+            generator.SetMonoData(data);
+
+            generator.SaveToFile(writer);
         }
     }
 }
